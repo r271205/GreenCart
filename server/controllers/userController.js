@@ -29,8 +29,6 @@ export const register = async (req, res) => {
             secure: true, //use secure cookie in production
             sameSite: 'None' , //CSRF protection
             maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
-            path: '/', // cookie available in entire website
-            domain:'green-cart-ikje.vercel.app'
         })
 
         return res.json({success:true, user:{email:user.email, name:user.name}})
@@ -69,9 +67,7 @@ export const login = async (req, res) => {
             httpOnly: true, 
             secure: true, 
             sameSite: 'None' , 
-            maxAge: 7 * 24 * 60 * 60 * 1000, 
-            path: '/', // cookie available in entire website
-            domain:'green-cart-ikje.vercel.app'
+            maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
         return res.json({success:true, user:{email:user.email, name:user.name}})
@@ -101,8 +97,6 @@ export const logout = async (req,res) => {
             httpOnly:true,
             secure:true,
             sameSite: 'None',
-            path: '/', // cookie available in entire website
-            domain:'green-cart-ikje.vercel.app'
         });
         return res.json({success:true, message:"Logged out successfully!"});
     } catch (error) {
