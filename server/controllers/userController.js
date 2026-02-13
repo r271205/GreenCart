@@ -29,6 +29,8 @@ export const register = async (req, res) => {
             secure: process.env.NODE_ENV === "production", //use secure cookie in production
             sameSite: process.env.NODE_ENV === "production" ? 'none' : 'strict' , //CSRF protection
             maxAge: 7 * 24 * 60 * 60 * 1000, // cookie expiration time
+            path: '/', // cookie available in entire website
+            domain:'green-cart-ikje.vercel.app'
         })
 
         return res.json({success:true, user:{email:user.email, name:user.name}})
@@ -68,6 +70,8 @@ export const login = async (req, res) => {
             secure: process.env.NODE_ENV === "production", 
             sameSite: process.env.NODE_ENV === "production" ? 'none' : 'strict' , 
             maxAge: 7 * 24 * 60 * 60 * 1000, 
+            path: '/', // cookie available in entire website
+            domain:'green-cart-ikje.vercel.app'
         })
 
         return res.json({success:true, user:{email:user.email, name:user.name}})
@@ -97,6 +101,8 @@ export const logout = async (req,res) => {
             httpOnly:true,
             secure:process.env.NODE_ENV === "production",
             sameSite: process.env.NODE_ENV === "production" ? 'none' : 'strict',
+            path: '/', // cookie available in entire website
+            domain:'green-cart-ikje.vercel.app'
         });
         return res.json({success:true, message:"Logged out successfully!"});
     } catch (error) {
