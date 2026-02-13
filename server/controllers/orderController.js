@@ -107,17 +107,17 @@ export const stripeWebhooks = async (req, res) => {
   //stripe gateway initialize
   const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
 
-  const sig = request.headers["stripe-signature"];
+  const sig = req.headers["stripe-signature"];
   let event;
 
   try {
     event = stripeInstance.webhooks.constructEvent(
-      request.body,
+      req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET,
     );
   } catch (error) {
-    response.status(400).send(`Webhook error: ${error.message}`);
+    return res.status(400).send(`Webhook error: ${error.message}`);
   }
 
   //handle the event
@@ -148,7 +148,7 @@ export const stripeWebhooks = async (req, res) => {
       const session = await stripeInstance.checkout.sessions.list({
         payment_intent: paymentIntentId,
       });
-      const { orderId } = session.data[0].metadata;
+      const { orderId, userID } = session.data[0].metadata;
       await Order.findByIdAndDelete(orderId);
       break;
     }
@@ -157,13 +157,14 @@ export const stripeWebhooks = async (req, res) => {
       console.error(`Unhandled event type ${event.type}`);
       break;
   }
-  response.json({ received: true });
+  res.json({ received: true });
 };
 
 //Get Orders by userId : /api/order/user
-export const getUserOrder = async (req, res) => {
+export const getUserOrders = async (req, res) => {
   try {
     const { userId } = req.body;
+
     let orders = await Order.find({
       userId,
       $or: [{ paymentType: "COD" }, { isPaid: true }],
@@ -171,16 +172,19 @@ export const getUserOrder = async (req, res) => {
       .populate("items.product address")
       .sort({ createdAt: -1 });
 
-    orders = orders.map((order) => ({
+    // ✅ REMOVE items with deleted products
+    orders = orders.map(order => ({
       ...order.toObject(),
-      items: order.items.filter((item) => item.product !== null),
+      items: order.items.filter(item => item.product !== null),
     }));
 
-    res.json({ success: true, orders });
+    return res.json({ success: true, orders });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    console.log(error.message);
+    return res.json({ success: false, message: error.message });
   }
 };
+
 
 //Get All Orders (for seller / admin) : /api/order/seller
 export const getAllOrders = async (req, res) => {

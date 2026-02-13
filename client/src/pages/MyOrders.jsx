@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppContext } from '../context/AppContext.jsx';
-import { dummyOrders } from '../assets/assets';
+
 
 const MyOrders = () => {
     const [myOrders, setMyOrders] = useState([]);
@@ -22,7 +22,9 @@ const MyOrders = () => {
     }, [])
 
     useEffect(() => {
+        if(user){
             fetchMyOrders();
+        }
     },[user])
 
   return (
